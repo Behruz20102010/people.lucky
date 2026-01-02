@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Bot - Telegram Case Opening</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        .nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* Main Content */
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        /* User Info Card */
+        .user-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-text {
+            color: white;
+        }
+
+        .user-text h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .user-id {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .stars-balance {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            padding: 15px 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stars-balance h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .stars-count {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Cases Grid */
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .case-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .case-card:hover::before {
+            left: 100%;
+        }
+
+        .case-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .case-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .case-card h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .case-cost {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .open-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .case-blue .open-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .case-purple .open-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .case-gold .open-btn {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+        }
+
+        .open-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Top Up Button */
+        .topup-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .topup-btn {
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .topup-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            position: relative;
+            animation: modalAppear 0.5s;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .spinning-case {
+            font-size: 120px;
+            animation: spin 1s linear infinite;
+            margin: 30px 0;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .prize-reveal {
+            font-size: 100px;
+            margin: 30px 0;
+            animation: prizeAppear 0.5s;
+        }
+
+        @keyframes prizeAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal h2 {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .prize-name {
+            color: #ffd700;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .prize-value {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .withdraw-btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .withdraw-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Profile Page */
+        .profile-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-section h2 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .prizes-won {
+            margin-top: 30px;
+        }
+
+        .prize-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prize-item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .prize-item-icon {
+            font-size: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav">
+            <div class="logo">
+                🎰 Lucky Bot
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showPage('home')">Glavniy</button>
+                <button class="nav-btn" onclick="showPage('profile')">Profil</button>
+            </div>
+        </div>
+
+        <!-- Home Page -->
+        <div id="home" class="content active">
+            <!-- User Card -->
+            <div class="user-card">
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="avatar" id="userAvatar">U</div>
+                        <div class="user-text">
+                            <h2 id="userName">User</h2>
+                            <p class="user-id">ID: <span id="userId">Loading...</span></p>
+                        </div>
+                    </div>
+                    <div class="stars-balance">
+                        <h3>⭐ Stars</h3>
+                        <div class="stars-count" id="starsBalance">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cases Grid -->
+            <div class="cases-grid">
+                <div class="case-card case-blue" onclick="openCase(7, '📦')">
+                    <div class="case-icon">📦</div>
+                    <h3>Bronze Case</h3>
+                    <p class="case-cost">⭐ 7 Stars</p>
+                    <button class="open-btn">OCHISH</button>
+                </div>
+
+                <div class="case-card case-purple" onclick="openCase(15, '🎁')">
+                    <div class="case-icon">🎁</div>
+                    <h3>Silver Case</h3>
+                    <p class="case-cost">⭐ 15 Stars</p>
+                    <button class="open-btn">OCHISH</button>
+                </div>
+
+                <div class="case-card case-gold" onclick="openCase(25, '💎')">
+                    <div class="case-icon">💎</div>
+                    <h3>Gold Case</h3>
+                    <p class="case-cost">⭐ 25 Stars</p>
+                    <button class="open-btn">OCHISH</button>
+                </div>
+            </div>
+
+            <!-- Top Up Section -->
+            <div class="topup-section">
+                <button class="topup-btn" onclick="topUp()">💰 TOP UP STARS</button>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile" class="content">
+            <div class="profile-section">
+                <h2>📊 Statistika</h2>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <h3>Jami Ochilgan</h3>
+                        <div class="stat-value" id="totalOpened">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Jami Yutilgan</h3>
+                        <div class="stat-value" id="totalWon">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Eng Katta Yutuq</h3>
+                        <div class="stat-value" id="biggestWin">0⭐</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section prizes-won">
+                <h2>🏆 Yutilgan Sovg'alar</h2>
+                <div id="prizesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="caseModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sample prizes
+        const prizes = [
+            { icon: '🧸', name: 'Teddy Bear', value: 15 },
+            { icon: '🎁', name: 'Gift Box', value: 25 },
+            { icon: '🎂', name: 'Birthday Cake', value: 50 },
+            { icon: '💎', name: 'Diamond', value: 100 }
+        ];
+
+        // User data (bu admindan keladi)
+        let userData = {
+            name: 'User',
+            id: Math.floor(Math.random() * 100000),
+            stars: 0,
+            totalOpened: 0,
+            totalWon: 0,
+            biggestWin: 0,
+            wonPrizes: []
+        };
+
+        // Initialize
+        document.getElementById('userId').textContent = userData.id;
+        document.getElementById('userName').textContent = userData.name;
+        document.getElementById('starsBalance').textContent = userData.stars;
+        updateProfile();
+
+        function showPage(page) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(page).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function openCase(cost, icon) {
+            if (userData.stars < cost) {
+                alert('❌ Yetarli stars yo\'q! Top Up qiling.');
+                return;
+            }
+
+            userData.stars -= cost;
+            document.getElementById('starsBalance').textContent = userData.stars;
+
+            const modal = document.getElementById('caseModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modal.classList.add('active');
+            modalContent.innerHTML = `
+                <h2>Case ochilmoqda...</h2>
+                <div class="spinning-case">${icon}</div>
+            `;
+
+            setTimeout(() => {
+                const prize = prizes[Math.floor(Math.random() * prizes.length)];
+                userData.totalOpened++;
+                userData.totalWon += prize.value;
+                userData.wonPrizes.push(prize);
+                
+                if (prize.value > userData.biggestWin) {
+                    userData.biggestWin = prize.value;
+                }
+
+                updateProfile();
+
+                modalContent.innerHTML = `
+                    <h2>🎉 Tabriklaymiz!</h2>
+                    <div class="prize-reveal">${prize.icon}</div>
+                    <div class="prize-name">${prize.name}</div>
+                    <div class="prize-value">Qiymati: ${prize.value} ⭐</div>
+                    <button class="withdraw-btn" onclick="withdraw('${prize.name}', ${prize.value})">
+                        💸 WITHDRAW QILISH
+                    </button>
+                `;
+            }, 3000);
+        }
+
+        function withdraw(prizeName, value) {
+            const message = `Sovg'a: ${prizeName} (${value}⭐)\nUser ID: ${userData.id}\nScreenshot tashlang!`;
+            window.open('https://t.me/behruzbek_odilov', '_blank');
+            alert('✅ Telegram orqali screenshot tashlang va sovg\'angizni oling!');
+        }
+
+        function closeModal() {
+            document.getElementById('caseModal').classList.remove('active');
+        }
+
+        function topUp() {
+            window.open('https://t.me/behruzbek_odilov', '_blank');
+        }
+
+        function updateProfile() {
+            document.getElementById('totalOpened').textContent = userData.totalOpened;
+            document.getElementById('totalWon').textContent = userData.totalWon + '⭐';
+            document.getElementById('biggestWin').textContent = userData.biggestWin + '⭐';
+
+            const prizesList = document.getElementById('prizesList');
+            if (userData.wonPrizes.length === 0) {
+                prizesList.innerHTML = '<p style="color: white; opacity: 0.6; text-align: center;">Hali sovg\'alar yo\'q</p>';
+            } else {
+                prizesList.innerHTML = userData.wonPrizes.map((prize, index) => `
+                    <div class="prize-item">
+                        <div class="prize-item-info">
+                            <div class="prize-item-icon">${prize.icon}</div>
+                            <div>
+                                <div style="font-weight: bold;">${prize.name}</div>
+                                <div style="opacity: 0.7;">Qiymati: ${prize.value}⭐</div>
+                            </div>
+                        </div>
+                        <button class="withdraw-btn" style="padding: 10px 20px; font-size: 14px;" 
+                                onclick="withdraw('${prize.name}', ${prize.value})">
+                            Withdraw
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
